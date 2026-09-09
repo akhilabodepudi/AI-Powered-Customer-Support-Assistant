@@ -1,0 +1,31 @@
+services:
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/data/support.db
+      FRONTEND_ORIGIN: http://localhost:3000
+    volumes:
+      - support_data:/app/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  support_data:
+
