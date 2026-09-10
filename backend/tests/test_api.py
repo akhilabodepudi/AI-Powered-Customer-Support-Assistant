@@ -4,6 +4,26 @@ def test_health(client):
     assert response.json()["status"] == "healthy"
 
 
+def test_root(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json()["docs"] == "/docs"
+
+
+def test_vercel_origin_is_allowed(client):
+    origin = "https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app"
+    response = client.options(
+        "/api/chat",
+        headers={
+            "Origin": origin,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Content-Type",
+        },
+    )
+    assert response.status_code in {200, 204}
+    assert response.headers.get("access-control-allow-origin") == origin
+
+
 def test_grounded_answer_has_citations(client):
     response = client.post("/api/chat", json={"message": "How long do I have to return an unused item?"})
     body = response.json()

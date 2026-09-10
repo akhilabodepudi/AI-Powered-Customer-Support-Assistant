@@ -33,9 +33,11 @@ app = FastAPI(
 settings = get_settings()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
+    allow_origins=[origin.strip() for origin in settings.frontend_origin.split(",") if origin.strip()]
+    + ["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-Admin-Key"],
 )
 
@@ -43,6 +45,11 @@ app.add_middleware(
 def require_admin(x_admin_key: str = Header(default="")) -> None:
     if not secrets.compare_digest(x_admin_key, settings.admin_api_key):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin credentials")
+
+
+@app.get("/")
+def root() -> dict:
+    return {"service": "AI Customer Support Assistant API", "health": "/health", "docs": "/docs"}
 
 
 @app.get("/health")
