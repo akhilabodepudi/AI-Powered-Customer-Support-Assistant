@@ -4,7 +4,7 @@ A production-minded customer support application that gives customers fast answe
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688) ![React](https://img.shields.io/badge/React-TypeScript-149ECA) ![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000) ![Render](https://img.shields.io/badge/API-Render-46E3B7) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 
-**Live demo:** [customer chat](https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app) · [API docs](https://ai-powered-customer-support-assistant-pihc.onrender.com/docs) ·
+**Live demo:** [customer chat](https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app) · [API docs](https://ai-powered-customer-support-assistant-pihc.onrender.com/docs)
 
 Try a policy question such as “How long do I have to return an item?” Greetings like “hi” are not in the knowledge base, so the assistant escalates instead of guessing. The Render free API may take 30–50 seconds to wake after idle time.
 
