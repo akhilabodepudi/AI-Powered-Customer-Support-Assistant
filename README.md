@@ -203,16 +203,6 @@ Tests cover health, grounded answers with citations, unknown-question escalation
 - Connect escalation to Zendesk, Salesforce Service Cloud, Intercom, or Freshdesk.
 - Add scheduled evaluation and drift monitoring before automated policy publishing.
 
-## Resume-ready project entry
-
-**AI-Powered Customer Support Assistant** | Python, FastAPI, React, TypeScript, OpenAI API, RAG, SQLite, Docker, Vercel, Render
-
-- Engineered a full-stack customer support assistant that delivers grounded responses from approved policy documents, with source citations, confidence scoring, and automatic human escalation for unsupported questions.
-- Built FastAPI services for conversational search, PDF/Markdown knowledge ingestion, feedback capture, and support analytics; added protected admin APIs and persistent conversation history.
-- Implemented retrieval thresholds and context-only generation guardrails to reduce hallucinations, plus a deterministic offline mode for cost-free testing and reproducible demos.
-- Delivered a responsive React/TypeScript chat experience, containerized local/Docker setup, GitHub CI, and a public split deploy (Vercel frontend + Render API) with CORS and build-time API URL configuration.
-
-> Use only claims and metrics you can demonstrate. After running a labeled evaluation set, replace general claims with measured results such as grounded-answer accuracy, escalation precision, or response latency.
 
 ## License
 
