@@ -2,7 +2,11 @@
 
 A production-minded customer support application that gives customers fast answers **without inventing policy details**. It retrieves relevant passages from an approved knowledge base, generates or extracts an answer, displays source citations and confidence, collects feedback, and routes uncertain questions to a human.
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688) ![React](https://img.shields.io/badge/React-TypeScript-149ECA) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![FastAPI](https://img.shields.io/badge/FastAPI-0.116-009688) ![React](https://img.shields.io/badge/React-TypeScript-149ECA) ![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000) ![Render](https://img.shields.io/badge/API-Render-46E3B7) ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
+
+**Live demo:** [customer chat](https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app) · [API docs](https://ai-powered-customer-support-assistant-pihc.onrender.com/docs) · [health](https://ai-powered-customer-support-assistant-pihc.onrender.com/health)
+
+Try a policy question such as “How long do I have to return an item?” Greetings like “hi” are not in the knowledge base, so the assistant escalates instead of guessing. The Render free API may take 30–50 seconds to wake after idle time.
 
 ## Why this solves a real support problem
 
@@ -39,7 +43,7 @@ flowchart LR
 | Retrieval | TF-IDF-style local search; chunking with section metadata |
 | Generation | OpenAI API + strict grounded prompt, or offline extractive mode |
 | Data | SQLite for portable demo; schema supports conversations, feedback, and escalations |
-| Delivery | Docker, Docker Compose, Nginx, health checks |
+| Delivery | Vercel (frontend), Render (API), Docker Compose, Nginx, health checks |
 | Quality | Pytest API tests, Ruff, ESLint, TypeScript strict mode |
 
 ## Quick start with Docker
@@ -79,6 +83,74 @@ cd frontend
 npm install
 npm run dev
 ```
+
+Open the UI at `http://localhost:5173`. The local frontend expects the API at `http://localhost:8000`.
+
+## Deploy
+
+The hosted demo splits the app across two services:
+
+| Piece | Host | URL |
+| --- | --- | --- |
+| Chat UI (`frontend/`) | Vercel | https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app |
+| FastAPI (`backend/`) | Render | https://ai-powered-customer-support-assistant-pihc.onrender.com |
+
+GitHub Pages cannot run the Python API, so the UI and API are deployed separately from this repository.
+
+### 1. API on Render
+
+1. Create a **Web Service** from this GitHub repo.
+2. Set **Root Directory** to `backend`.
+3. Use **Python 3** (recommended) with:
+
+```text
+Build Command:  pip install -r requirements.txt
+Start Command:  uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+   Docker also works (`backend/Dockerfile`). Prefer the Python start command above so the process listens on Render’s `$PORT`.
+4. Choose the **Free** instance if you want a zero-cost demo.
+5. Add these environment variables:
+
+| Key | Example |
+| --- | --- |
+| `APP_ENV` | `production` |
+| `AI_PROVIDER` | `local` |
+| `DATABASE_PATH` | `data/support.db` |
+| `ADMIN_API_KEY` | a long random secret |
+| `FRONTEND_ORIGIN` | your Vercel origin, for example `https://ai-powered-customer-support-assistant-akhilabodepudis-projects.vercel.app` |
+
+Leave `OPENAI_API_KEY` empty while `AI_PROVIDER=local`. The API also allows `*.vercel.app` origins so the chat UI can call it after a Vercel URL change.
+
+After deploy, confirm `https://<your-service>.onrender.com/health` returns `"status": "healthy"`. That origin (no path) is the public **API URL**.
+
+### 2. Frontend on Vercel
+
+1. Import this GitHub repo in Vercel. Do not use the clone-into-a-new-repo flow.
+2. Set **Root Directory** to `frontend` and keep the **Vite** preset.
+3. Build command `npm run build`, output directory `dist`.
+4. Add **only** this environment variable (Vite inlines it at build time):
+
+| Key | Value |
+| --- | --- |
+| `VITE_API_URL` | `https://ai-powered-customer-support-assistant-pihc.onrender.com` |
+
+   Do not copy backend variables (`DATABASE_PATH`, `ADMIN_API_KEY`, and so on) into Vercel. They are unused by the UI.
+5. Deploy. If you change `VITE_API_URL` later, **Redeploy** so the new value is baked into the bundle.
+6. Turn off **Deployment Protection** if you want the demo to be public without a Vercel login.
+
+Then set `FRONTEND_ORIGIN` on Render to the exact `https://….vercel.app` origin from the address bar (no trailing slash) and save so CORS matches.
+
+### 3. OpenAI (optional)
+
+On Render only:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your-key
+```
+
+Never commit `.env` or API keys.
 
 ## API examples
 
@@ -133,12 +205,12 @@ Tests cover health, grounded answers with citations, unknown-question escalation
 
 ## Resume-ready project entry
 
-**AI-Powered Customer Support Assistant** | Python, FastAPI, React, TypeScript, OpenAI API, RAG, SQLite, Docker
+**AI-Powered Customer Support Assistant** | Python, FastAPI, React, TypeScript, OpenAI API, RAG, SQLite, Docker, Vercel, Render
 
 - Engineered a full-stack customer support assistant that delivers grounded responses from approved policy documents, with source citations, confidence scoring, and automatic human escalation for unsupported questions.
 - Built FastAPI services for conversational search, PDF/Markdown knowledge ingestion, feedback capture, and support analytics; added protected admin APIs and persistent conversation history.
 - Implemented retrieval thresholds and context-only generation guardrails to reduce hallucinations, plus a deterministic offline mode for cost-free testing and reproducible demos.
-- Delivered a responsive React/TypeScript chat experience and containerized deployment with Docker Compose, health checks, automated API tests, and CI-ready linting.
+- Delivered a responsive React/TypeScript chat experience, containerized local/Docker setup, GitHub CI, and a public split deploy (Vercel frontend + Render API) with CORS and build-time API URL configuration.
 
 > Use only claims and metrics you can demonstrate. After running a labeled evaluation set, replace general claims with measured results such as grounded-answer accuracy, escalation precision, or response latency.
 
